@@ -1,7 +1,7 @@
 ;;;; Package definitions for package-api.
 
 (defpackage :package-api
-  (:description
+  (:documentation
    "Extract API from a package.")
   (:use :cl)
   (:export :extract-api))
