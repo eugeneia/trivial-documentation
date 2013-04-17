@@ -36,10 +36,13 @@
 		      (macro-function function-name)
 		      (fdefinition function-name))))
     #-(or openmcl
-	  lispworks) (second (function-lambda-expression function))
+	  lispworks
+	  sbcl)
+    (second (function-lambda-expression function))
     #+openmcl        (declare (ignore function))
     #+openmcl        (ccl:arglist function-name)
-    #+lispworks      (lw:function-lambda-list function)))
+    #+lispworks      (lw:function-lambda-list function)
+    #+sbcl (sb-introspect:function-lambda-list function)))
 
 (defun function-definition (function-name)
   "Construct definition for FUNCTION-NAME."
