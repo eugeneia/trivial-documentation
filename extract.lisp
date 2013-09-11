@@ -118,6 +118,7 @@
 
 (defun extract-api (package)
   "Extract external symbol definitions in PACKAGE."
-  (loop for symbol in (sorted-symbol-list package)
-     collect (keyword-symbol symbol)
-     collect (symbol-definitions symbol)))
+  (values (documentation (find-package package) t)
+          (loop for symbol in (sorted-symbol-list package)
+             collect (keyword-symbol symbol)
+             collect (symbol-definitions symbol))))
