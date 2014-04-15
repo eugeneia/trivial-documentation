@@ -1,4 +1,4 @@
-;;;; Test package for package-api.
+;;;; Test package for PACKAGE-API.
 
 (defpackage package-api.test-package
   (:use :cl)
@@ -16,7 +16,7 @@
 
 (in-package :package-api.test-package)
 
-(defvar *variable* 1 "variable")
+(defparameter *variable* 1 "variable")
 
 (defconstant +constant+ 2 "constant")
 
@@ -35,9 +35,16 @@
   "setf"
   (setf (car (nthcdr (1- n) x)) v))
 
-(defclass class-a-defn () ((foo :initarg :foo :initform 3)) (:documentation "class-a"))
-(defclass class-b-defn () ((bar :initarg :bar  :initform 4)) (:documentation "class-b"))
-(defclass class-c-defn (class-a-defn class-b-defn) ((boom :initarg :boom :initform 5))
+(defclass class-a-defn ()
+  ((foo :initarg :foo :initform 3))
+  (:documentation "class-a"))
+
+(defclass class-b-defn ()
+  ((bar :initarg :bar  :initform 4))
+  (:documentation "class-b"))
+
+(defclass class-c-defn (class-a-defn class-b-defn)
+  ((baz :initarg :boom :initform 5))
   (:documentation "class-c"))
 
 (defstruct structure-defn
@@ -45,3 +52,4 @@
   (foo 0))
 
 (deftype type-defn () "type" 'integer)
+
