@@ -1,10 +1,6 @@
-;;;; Extract API from a package.
+;;;; Extract documentation and definitions for symbols and packages.
 
 (in-package :package-api)
-
-(defun keyword-symbol (symbol)
-  "Returns SYMBOL interned into the :keyword package."
-  (intern (symbol-name symbol) :keyword))
 
 (defun make-definition (kind &rest plist)
   "Prepend PLIST with ((:kind KIND)). Base definition constructor."
@@ -108,17 +104,20 @@
       (push (type-definition symbol) definitions))
     (nreverse definitions)))
 
-(defun sorted-symbol-list (package)
-  "Returns sorted list of symbols in PACKAGE."
-  (sort (loop for symbol being the external-symbols in package
-	   collect symbol)
-	(lambda (symbol-x symbol-y)
-	  (string< (symbol-name symbol-x)
-		   (symbol-name symbol-y)))))
+(defun symbol-name-< (symbol-x symbol-y)
+  "Predicate to test if symbol names of SYMBOL-X and SYMBOL-Y satisfy
+STRING<."
+  (string< (symbol-name symbol-x)
+           (symbol-name symbol-y)))
 
 (defun extract-api (package)
-  "Extract external symbol definitions in PACKAGE."
-  (values (documentation (find-package package) t)
-          (loop for symbol in (sorted-symbol-list package)
-             collect (keyword-symbol symbol)
-             collect (symbol-definitions symbol))))
+  "Extract inline documentation and definitions for PACKAGE. If
+INTERNAL-P is _true_ also extract definitions for internal symbols."
+  (values
+   (documentation (find-package package) t)
+   (loop for symbol in
+        (sort (loop for symbol being the external-symbols in package
+                 collect symbol)
+              #'symbol-name-<)
+      collect symbol
+      collect (symbol-definitions symbol))))
