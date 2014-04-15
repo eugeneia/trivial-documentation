@@ -1,7 +1,8 @@
-;;;; Package definitions for package-api.
+;;;; Package definitions for PACKAGE-API.
 
 (defpackage :package-api
   (:documentation
    "Extract API from a package.")
   (:use :cl)
-  (:export :extract-api))
+  (:export :symbol-definitions
+           :extract-api))
