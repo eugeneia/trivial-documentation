@@ -1,13 +1,21 @@
 ;;;; Extract documentation and definitions for symbols and packages.
 
-(in-package :package-api)
+(defpackage :trivial-documentation
+  (:documentation
+   "Extract documentation and definitions for symbols and packages.")
+  (:use :cl)
+  (:export :symbol-definitions
+           :package-api))
+
+(in-package :trivial-documentation)
 
 (defun make-definition (kind &rest plist)
-  "Prepend PLIST with ((:kind KIND)). Base definition constructor."
+  "Base definition constructor. Prepend PLIST with :KIND property of
+value KIND."
   (list* :kind kind plist))
 
 (defun variable-definition (variable-name)
-  "Construct definition for VARIABLE."
+  "Compile definition for VARIABLE."
   (make-definition (if (constantp variable-name) :constant :variable)
 		   :value (symbol-value variable-name)
 		   :documentation (documentation variable-name
@@ -27,7 +35,7 @@
   (typep (fdefinition function-name) 'standard-generic-function))
 
 (defun lambda-list (function-name)
-  "Return lambda list for FUNCTION."
+  "Get lambda list for FUNCTION-NAME."
   (let ((function (if (macro-function-p function-name)
 		      (macro-function function-name)
 		      (fdefinition function-name))))
@@ -41,31 +49,27 @@
     #+sbcl (sb-introspect:function-lambda-list function)))
 
 (defun function-definition (function-name)
-  "Construct definition for FUNCTION-NAME."
-  (make-definition (cond ((macro-function-p function-name)
-			  :macro)
-			 ((generic-function-p function-name)
-			  :generic-function)
-			 (t
-			  :function))
-		   :lambda-list (lambda-list function-name)
-		   :documentation (documentation function-name
-						 'function)))
+  "Compile definition for FUNCTION-NAME."
+  (make-definition
+   (cond ((macro-function-p function-name)   :macro)
+         ((generic-function-p function-name) :generic-function)
+         (t                                  :function))
+   :lambda-list (lambda-list function-name)
+   :documentation (documentation function-name 'function)))
 
 (defun class-precedence-list (class-name)
-  "Returns class precedence list for CLASS-NAME."
+  "Get class precedence list for CLASS-NAME."
   (closer-mop:class-precedence-list (find-class class-name)))
 
-
 (defun class-slot-initargs (class-name)
-  "Returns class slot initargs for CLASS-NAME."
+  "Get class slot initargs for CLASS-NAME."
   (let ((class (find-class class-name)))
     (mapcan (lambda (slot)
 	      (copy-seq (closer-mop:slot-definition-initargs slot)))
             (closer-mop:class-slots class))))
 
 (defun class-definition (class-name)
-  "Construct definition for CLASS-NAME."
+  "Compile definition for CLASS-NAME."
   (if (subtypep (find-class class-name)
 		(find-class 'structure-object))
       (make-definition :structure
@@ -79,11 +83,35 @@
 		   
 
 (defun type-definition (type-name)
-  "Construct definition for TYPE-NAME."
+  "Compile definition for TYPE-NAME."
   (make-definition :type :documentation (documentation type-name 'type)))
 
 (defun symbol-definitions (symbol)
-  "Returns a list of definitions for SYMBOL."
+  "*Arguments and Values:*
+
+   _symbol_—a symbol.
+
+   *Description:*
+
+   {symbol-definitions} compiles and returns a list of definitions for
+   _symbol_. Each definition is a _property list_ containing at least two
+   _properties_:
+
+   + {:kind}—one of {:constant}, {:variable}, {:function},
+     {:generic-function}, {:macro}, {:structure}, {:class} or {:type}.
+   + {:documentation}—the respective documentation string or {nil}.
+
+   Definitions of kind {:constant} and {:variable} have an additional
+   _property_ {:value} which holds the initial value of the constant or
+   variable.
+
+   Definitions of kind {:function}, {:generic-function} and {:macro} have
+   an additional _property_ {:lambda-list} which holds the lambda list of
+   the (generic) function or macro.
+
+   Definitions of kind {:class} have two additional _properties_
+   {:precedence-list} and {:initargs} which hold the class precedence
+   list and initialization arguments of the class."
   (let (definitions)
     ;; variable/constant?
     (when (boundp symbol)
@@ -110,9 +138,17 @@ STRING<."
   (string< (symbol-name symbol-x)
            (symbol-name symbol-y)))
 
-(defun extract-api (package)
-  "Extract inline documentation and definitions for PACKAGE. If
-INTERNAL-P is _true_ also extract definitions for internal symbols."
+(defun package-api (package)
+  "*Arguments and Values:*
+
+   _package_—a _package_ or a _string designator_ naming a _package_.
+
+   *Description:*
+
+   {extract-api} compiles and returns a _property list_ mapping the
+   external symbols of _package_ to lists of definitions as returned by
+   {symbol-definitions}. The returned _property list_ is in alphabetical
+   order (by comparing the keys)."
   (values
    (documentation (find-package package) t)
    (loop for symbol in

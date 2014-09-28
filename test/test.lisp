@@ -1,10 +1,11 @@
-;;;; Tests for PACKAGE-API (requires PACKAGE-API.TEST-PACKAGE).
+;;;; Tests for TRIVIAL-DOCUMENTATION (requires
+;;;; TRIVIAL-DOCUMENTATION.TEST-PACKAGE).
 
-(defpackage package-api.test
-  (:use :cl :package-api :package-api.test-package)
+(defpackage trivial-documentation.test
+  (:use :cl :trivial-documentation :trivial-documentation.test-package)
   (:export :run-tests))
 
-(in-package :package-api.test)
+(in-package :trivial-documentation.test)
 
 (defun assert-symbol-definitions (symbol definitions)
   (assert (equal (symbol-definitions symbol) definitions)))
@@ -44,15 +45,15 @@
   (assert-symbol-definitions
    'function-defn
    '((:kind :function
-      :lambda-list (package-api.test-package::foo &rest
-                    package-api.test-package::bar)
+      :lambda-list (trivial-documentation.test-package::foo &rest
+                    trivial-documentation.test-package::bar)
       :documentation "function")))
 
   (assert-symbol-definitions
    'generic-function-defn
    '((:kind :generic-function
-      :lambda-list (package-api.test-package::foo
-                    &optional package-api.test-package::bar)
+      :lambda-list (trivial-documentation.test-package::foo
+                    &optional trivial-documentation.test-package::bar)
       :documentation "generic-function")))
 
   ;;; This works only when called from the CL-USER package.
@@ -65,9 +66,9 @@
   (assert-symbol-definitions
    'setf-defn
    '((:kind :function
-      :lambda-list (package-api.test-package::x
-                    package-api.test-package::n
-                    package-api.test-package::v)
+      :lambda-list (trivial-documentation.test-package::x
+                    trivial-documentation.test-package::n
+                    trivial-documentation.test-package::v)
       :documentation "setf")))
 
   (assert-symbol-definitions

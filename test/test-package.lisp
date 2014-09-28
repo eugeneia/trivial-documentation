@@ -1,6 +1,8 @@
-;;;; Test package for PACKAGE-API.
+;;;; Test package for TRIVIAL-DOCUMENTATION.
 
-(defpackage package-api.test-package
+(defpackage trivial-documentation.test-package
+  (:documentation
+   "Test package for TRIVIAL-DOCUMENTATION.")
   (:use :cl)
   (:export :*variable*
 	   :+constant+
@@ -14,7 +16,7 @@
 	   :structure-defn
 	   :type-defn))
 
-(in-package :package-api.test-package)
+(in-package :trivial-documentation.test-package)
 
 (defparameter *variable* 1 "variable")
 
