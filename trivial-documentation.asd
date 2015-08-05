@@ -6,4 +6,4 @@
   :author "Max Rottenkolber <max@mr.gy>"
   :license "GNU AGPL"
   :components ((:file "extract"))
-  :depends-on ("closer-mop"))
+  :depends-on ("closer-mop" #+sbcl"sb-introspect"))
