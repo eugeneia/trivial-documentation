@@ -34,19 +34,35 @@ value KIND."
   "Tests if FUNCTION-NAME is bound to a generic function."
   (typep (fdefinition function-name) 'standard-generic-function))
 
+(defun normalize-lambda-list (lambda-list)
+  "Flatten symbols with default values."
+  (loop for head = lambda-list then (cdr head)
+        for o = (car head)
+        for with-defaults = (or (eq o '&key) (eq o '&optional))
+     while head
+     if (listp o) collect (normalize-lambda-list o) else collect o
+     when with-defaults
+     append (mapcar (lambda (o)
+                      (typecase o
+                        (list (first o))
+                        (otherwise o)))
+                    (cdr head))
+     until with-defaults))
+
 (defun lambda-list (function-name)
   "Get lambda list for FUNCTION-NAME."
   (let ((function (if (macro-function-p function-name)
 		      (macro-function function-name)
 		      (fdefinition function-name))))
-    #-(or openmcl
-	  lispworks
-	  sbcl)
-    (second (function-lambda-expression function))
-    #+openmcl        (declare (ignore function))
-    #+openmcl        (ccl:arglist function-name)
+    #+openmcl (declare (ignore function))
+    (normalize-lambda-list
+     #-(or openmcl
+           lispworks
+           sbcl)
+     (second (function-lambda-expression function))
+     #+openmcl        (ccl:arglist function-name)
     #+lispworks      (lw:function-lambda-list function)
-    #+sbcl (sb-introspect:function-lambda-list function)))
+    #+sbcl (sb-introspect:function-lambda-list function))))
 
 (defun function-definition (function-name)
   "Compile definition for FUNCTION-NAME."
@@ -80,7 +96,6 @@ value KIND."
 			       (class-precedence-list class-name))
 		       :initargs (class-slot-initargs class-name)
 		       :documentation (documentation class-name 'type))))
-		   
 
 (defun type-definition (type-name)
   "Compile definition for TYPE-NAME."

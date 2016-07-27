@@ -8,7 +8,10 @@
 (in-package :trivial-documentation.test)
 
 (defun assert-symbol-definitions (symbol definitions)
-  (assert (equal (symbol-definitions symbol) definitions)))
+  (unless (equal (symbol-definitions symbol) definitions)
+    (error "Assertion failed:~%(EQUAL~% ~a~% ~a)"
+           (symbol-definitions symbol)
+           definitions)))
 
 (defun run-tests ()
 
@@ -56,12 +59,17 @@
                     &optional trivial-documentation.test-package::bar)
       :documentation "generic-function")))
 
-  ;;; This works only when called from the CL-USER package.
   (assert-symbol-definitions
    'macro-defn
    '((:kind :macro
-      :lambda-list (common-lisp-user::foo &body common-lisp-user::body)
+      :lambda-list (first &body second)
       :documentation "macro")))
+
+  (assert-symbol-definitions
+   'macro2-defn
+   '((:kind :macro
+      :lambda-list (first (&key second) &optional third fourth)
+      :documentation "macro2")))
 
   (assert-symbol-definitions
    'setf-defn

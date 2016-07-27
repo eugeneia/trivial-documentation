@@ -9,6 +9,7 @@
 	   :function-defn
 	   :generic-function-defn
 	   :macro-defn
+           :macro2-defn
 	   :setf-defn
 	   :class-a-defn
 	   :class-b-defn
@@ -29,9 +30,13 @@
 (defgeneric generic-function-defn (foo &optional bar)
   (:documentation "generic-function"))
 
-(defmacro macro-defn (foo &body body)
+(defmacro macro-defn (first &body second)
   "macro"
-  `(,foo ,@body))
+  `(,first ,@second))
+
+(defmacro macro2-defn (first (&key (second 1)) &optional (third 3) fourth)
+  "macro2"
+  `(,first ,second ,third ,fourth))
 
 (defun (setf setf-defn) (x n v)
   "setf"
