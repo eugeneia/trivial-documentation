@@ -28,14 +28,16 @@
    '((:kind :class
       :precedence-list (class-a-defn standard-object t)
       :initargs (:foo)
-      :documentation "class-a")))
+      :documentation "class-a"
+      :slots nil)))
 
   (assert-symbol-definitions
    'class-b-defn
    '((:kind :class
       :precedence-list (class-b-defn standard-object t)
       :initargs (:bar)
-      :documentation "class-b")))
+      :documentation "class-b"
+      :slots nil)))
 
   (assert-symbol-definitions
    'class-c-defn
@@ -43,7 +45,8 @@
       :precedence-list (class-c-defn class-a-defn class-b-defn
                         standard-object t)
       :initargs (:bar :foo :boom)
-      :documentation "class-c")))
+      :documentation "class-c"
+      :slots (baz "foo"))))
 
   (assert-symbol-definitions
    'function-defn

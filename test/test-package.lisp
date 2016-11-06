@@ -14,6 +14,7 @@
 	   :class-a-defn
 	   :class-b-defn
 	   :class-c-defn
+           :baz
 	   :structure-defn
 	   :type-defn))
 
@@ -51,7 +52,7 @@
   (:documentation "class-b"))
 
 (defclass class-c-defn (class-a-defn class-b-defn)
-  ((baz :initarg :boom :initform 5))
+  ((baz :initarg :boom :initform 5 :documentation "foo"))
   (:documentation "class-c"))
 
 (defstruct structure-defn

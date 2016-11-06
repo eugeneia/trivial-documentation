@@ -84,6 +84,13 @@ value KIND."
 	      (copy-seq (closer-mop:slot-definition-initargs slot)))
             (closer-mop:class-slots class))))
 
+(defun class-slots (class-name)
+  "Get plist of slot names and docstrings for CLASS-NAME."
+  (loop for slot in (closer-mop:class-direct-slots (find-class class-name))
+     for docstring = (documentation slot t)
+     when docstring append
+       `(,(closer-mop:slot-definition-name slot) ,docstring)))
+
 (defun class-definition (class-name)
   "Compile definition for CLASS-NAME."
   (if (subtypep (find-class class-name)
@@ -95,7 +102,8 @@ value KIND."
 		       (mapcar #'class-name
 			       (class-precedence-list class-name))
 		       :initargs (class-slot-initargs class-name)
-		       :documentation (documentation class-name 'type))))
+		       :documentation (documentation class-name 'type)
+                       :slots (class-slots class-name))))
 
 (defun type-definition (type-name)
   "Compile definition for TYPE-NAME."
@@ -124,9 +132,10 @@ value KIND."
    an additional _property_ {:lambda-list} which holds the lambda list of
    the (generic) function or macro.
 
-   Definitions of kind {:class} have two additional _properties_
-   {:precedence-list} and {:initargs} which hold the class precedence
-   list and initialization arguments of the class."
+   Definitions of kind {:class} have three additional _properties_
+   {:precedence-list}, {:initargs}, and {:slots} which hold the class
+   precedence list, initialization arguments, and a _plist_ of _slot_ names and
+   documentation strings of the class."
   (let (definitions)
     ;; variable/constant?
     (when (boundp symbol)
